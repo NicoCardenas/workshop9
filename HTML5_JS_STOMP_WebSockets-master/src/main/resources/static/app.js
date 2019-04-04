@@ -62,7 +62,8 @@ var app = (function () {
 
         init: function (val) {            
             sala = "/topic/newpoint." + val;            
-            //document.getElementById('room').style.visibility = visible;
+            document.getElementById('canvas').style.visibility = "visible";
+            document.getElementById('pos').style.visibility = "visible";
             //websocket connection
             connectAndSubscribe();
         },

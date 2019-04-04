@@ -3,11 +3,12 @@ canvas {
     border-style: solid;
     margin: auto;
     display: block;
+    visibility: hidden;
 }
 
 .room {
     margin-top: 15px;
-    /*visibility: hidden;*/
+    visibility: hidden;
 }
 
 .input {
