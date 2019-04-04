@@ -8,6 +8,7 @@ var app = (function () {
     }
     
     var stompClient = null;
+    var sala;
 
     var addPointToCanvas = function (point) {        
         var canvas = document.getElementById("canvas");
@@ -28,7 +29,7 @@ var app = (function () {
     };
 
 
-    var connectAndSubscribe = function () {
+    var connectAndSubscribe = function () {        
         console.info('Connecting to WS...');
         var socket = new SockJS('/stompendpoint');
         stompClient = Stomp.over(socket);
@@ -36,7 +37,7 @@ var app = (function () {
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/newpoint', function (eventbody) {                
+            stompClient.subscribe(sala, function (eventbody) {                
                 onMessage(eventbody);
             });
         });         
@@ -48,16 +49,20 @@ var app = (function () {
         //alert(greeting);
     }
 
+    var listenerMouse = function (event) {
+        var can = document.getElementById("canvas");
+        can.addEventListener('click', function(event){
+            var pt = getMousePosition(event);
+            addPointToCanvas(pt);                
+            stompClient.send(sala, {}, JSON.stringify(pt));
+        });
+    }
+
     return {
 
-        init: function () {
-            var can = document.getElementById("canvas");
-            can.addEventListener('click', function(event){
-                var pt = getMousePosition(event);
-                addPointToCanvas(pt);
-                stompClient.send("/topic/newpoint", {}, JSON.stringify(pt));
-            });
-            
+        init: function (val) {            
+            sala = "/topic/newpoint." + val;            
+            //document.getElementById('room').style.visibility = visible;
             //websocket connection
             connectAndSubscribe();
         },
@@ -69,7 +74,7 @@ var app = (function () {
 
             //publicar el evento
             //enviando un objeto creado a partir de una clase
-            stompClient.send("/topic/newpoint", {}, JSON.stringify(pt));
+            stompClient.send(sala, {}, JSON.stringify(pt));
         },
 
         disconnect: function () {

@@ -1,1 +1,15 @@
+canvas {
+    border: 5px;
+    border-style: solid;
+    margin: auto;
+    display: block;
+}
 
+.room {
+    margin-top: 15px;
+    /*visibility: hidden;*/
+}
+
+.input {
+    margin-bottom: 10px
+}
