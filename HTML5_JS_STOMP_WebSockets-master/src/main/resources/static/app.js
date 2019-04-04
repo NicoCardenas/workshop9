@@ -45,13 +45,18 @@ var app = (function () {
     var onMessage = function (greeting) {
         var newpoint = JSON.parse(greeting.body); 
         addPointToCanvas(newpoint);
+        //alert(greeting);
     }
-    
 
     return {
 
         init: function () {
             var can = document.getElementById("canvas");
+            can.addEventListener('click', function(event){
+                var pt = getMousePosition(event);
+                addPointToCanvas(pt);
+                stompClient.send("/topic/newpoint", {}, JSON.stringify(pt));
+            });
             
             //websocket connection
             connectAndSubscribe();
