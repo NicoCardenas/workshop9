@@ -18,6 +18,19 @@ var app = (function () {
         ctx.stroke();
     };
     
+    var addPolygonToCanvas = function (eventbody){
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        var polygon=JSON.parse(eventbody.body);
+        ctx.fillStyle = '#2629ff';
+        ctx.beginPath();
+        ctx.moveTo(polygon[0].x,polygon[0].y);
+        for (var i=1;i<polygon.length;i++) {
+            ctx.lineTo(polygon[i].x,polygon[i].y);
+        }
+        ctx.closePath();
+        ctx.fill();
+    };   
     
     var getMousePosition = function (evt) {
         canvas = document.getElementById("canvas");
@@ -37,8 +50,9 @@ var app = (function () {
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);           
-            stompClient.subscribe("/topic"+sala, onMessage);
-        });         
+            stompClient.subscribe("/topic/newpoint." + sala, onMessage);
+            stompClient.subscribe('/topic/newpolygon.' + sala, addPolygonToCanvas);
+        });
     };
     
     var onMessage = function (greeting) {
@@ -52,14 +66,14 @@ var app = (function () {
         can.addEventListener('click', function(event){
             var pt = getMousePosition(event);
             addPointToCanvas(pt);                
-            stompClient.send("/app"+sala, {}, JSON.stringify(pt));
+            stompClient.send("/app/newpoint." + sala, {}, JSON.stringify(pt));
         });
     };
 
     return {
 
         init: function (val) {            
-            sala = "/newpoint." + val;
+            sala = val;
             listenerMouse();
             document.getElementById('canvas').style.visibility = "visible";
             document.getElementById('pos').style.visibility = "visible";
@@ -74,7 +88,7 @@ var app = (function () {
 
             //publicar el evento
             //enviando un objeto creado a partir de una clase
-            stompClient.send("/app"+sala, {}, JSON.stringify(pt));
+            stompClient.send("/app/newpoint."+sala, {}, JSON.stringify(pt));
         },
 
         disconnect: function () {
