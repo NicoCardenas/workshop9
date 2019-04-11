@@ -8,7 +8,7 @@ var app = (function () {
     }
     
     var stompClient = null;
-    var sala;
+    var sala = null;
 
     var addPointToCanvas = function (point) {        
         var canvas = document.getElementById("canvas");
@@ -36,10 +36,8 @@ var app = (function () {
         
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
-            console.log('Connected: ' + frame);
-            stompClient.subscribe(sala, function (eventbody) {                
-                onMessage(eventbody);
-            });
+            console.log('Connected: ' + frame);           
+            stompClient.subscribe(sala, onMessage);
         });         
     };
     
@@ -49,19 +47,20 @@ var app = (function () {
         //alert(greeting);
     }
 
-    var listenerMouse = function (event) {
+    var listenerMouse = function () {
         var can = document.getElementById("canvas");
         can.addEventListener('click', function(event){
             var pt = getMousePosition(event);
             addPointToCanvas(pt);                
-            stompClient.send(sala, {}, JSON.stringify(pt));
+            stompClient.send("/app"+sala, {}, JSON.stringify(pt));
         });
-    }
+    };
 
     return {
 
         init: function (val) {            
-            sala = "/topic/newpoint." + val;            
+            sala = "/topic/newpoint." + val;
+            listenerMouse();
             document.getElementById('canvas').style.visibility = "visible";
             document.getElementById('pos').style.visibility = "visible";
             //websocket connection
@@ -75,7 +74,7 @@ var app = (function () {
 
             //publicar el evento
             //enviando un objeto creado a partir de una clase
-            stompClient.send(sala, {}, JSON.stringify(pt));
+            stompClient.send("/app"+sala, {}, JSON.stringify(pt));
         },
 
         disconnect: function () {
