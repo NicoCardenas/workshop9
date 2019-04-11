@@ -37,7 +37,7 @@ var app = (function () {
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);           
-            stompClient.subscribe(sala, onMessage);
+            stompClient.subscribe("/topic"+sala, onMessage);
         });         
     };
     
@@ -59,7 +59,7 @@ var app = (function () {
     return {
 
         init: function (val) {            
-            sala = "/topic/newpoint." + val;
+            sala = "/newpoint." + val;
             listenerMouse();
             document.getElementById('canvas').style.visibility = "visible";
             document.getElementById('pos').style.visibility = "visible";
